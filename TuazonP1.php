@@ -1,123 +1,95 @@
 <?php
-$storeName = "Tambay-Tech";
-$tagline = "Build namin pang-forever. Sana all...";
+$storeName = "Cartridge Cove";
+$tagline = "Classic games para sa classic heartbreak";
 $owner = "Andrei James G. Tuazon";
 $section = "WD-201";
 $currency = "₱";
 
-$item1 = [
-    "name" => "NVIDIA RTX 4080 GPU",
-    "price" => "75000",
-    "stock" => 3,
-    "category" => "Graphics Card"
-];
-$item2 = [
-    "name" => "AMD Ryzen 7 7700X CPU",
-    "price" => 18000,
-    "stock" => "5",
-    "category" => "Processor"
-];
-$item3 = [
-    "name" => "Corsair 32GB DDR5 RAM",
-    "price" => "8500",
-    "stock" => 0,
-    "category" => "Memory"
-];
-$item4 = [
-    "name" => "Lian Li Lancool 216 Case",
-    "price" => 5500,
-    "stock" => 12,
-    "category" => "Chassis"
-];
+require "items.php";
 
-$products = [$item1, $item2, $item3, $item4];
+$totalPrice = 0;
+$totalStock = 0;
+$outOfStock = 0;
 
-$totalPrice = $item1["price"] + $item2["price"] + $item3["price"] + $item4["price"];
-$totalStock = $item1["stock"] + $item2["stock"] + $item3["stock"] + $item4["stock"];
+foreach ($items as $item) {
+    $totalPrice += $item["price"];
+    $totalStock += $item["stock"];
+    
+    if ($item["stock"] == 0) {
+        $outOfStock++;
+    }
+}
 
-$productCount = count($products);
-
-$overallStatus = "";
-if ($totalStock > 20) {
-    $overallStatus = "Warehouse is full! Massive inventory ready for dispatch.";
-} elseif ($totalStock > 0) {
-    $overallStatus = "Stock levels are good! Ship your dream PC today.";
-} else {
-    $overallStatus = "Critical Alert: Our shelves are currently bare.";
+switch (count($items)) {
+    case 1:
+        $storeCategory = "Single Cartridge Find";
+        break;
+    case 2:
+    case 3:
+        $storeCategory = "8-bit Starter Collection";
+        break;
+    case 4:
+    case 5:
+        $storeCategory = "16-bit Era Inventory";
+        break;
+    default:
+        $storeCategory = "Full Retro Workshop";
 }
 
 ?>
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="UTF-8">
     <title><?= $storeName ?></title>
 
     <style>
         body {
-            font-family: 'Consolas', monospace;
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            color: #d8d8ff;
+            font-family: 'Press Start 2P', cursive, monospace;
+            background: linear-gradient(135deg, #4b0082 0%, #00008b 50%, #800080 100%);
+            color: #ccff00;
             background-size: cover;
             background-repeat: no-repeat;
             padding: 20px;
         }
         h1 {
-            color: #00ffff;
-            text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff;
+            color: #ff00ff;
+            text-shadow: 2px 2px 0 #000;
             padding-bottom: 5px;
             margin-bottom: 5px;
+            border-bottom: 4px solid #ccff00;
         }
         h2 {
-            font-style: italic;
-            color: #a0a0ff;
+            font-style: normal;
+            color: #00ffff;
             margin-top: 0;
             margin-bottom: 20px;
         }
-        h1, h2, h3, .status-info {
+        h1, h2, h3, p {
             text-align: center;
         }
         table {
             width: 85%;
-            margin: 30px auto;
+            margin: auto;
             border-collapse: collapse;
-            background: rgba(30, 30, 50, 0.9);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.7);
+            box-shadow: 0 0 10px #ff00ff;
         }
         th, td {
-            border: 1px solid #444;
-            padding: 15px 10px;
+            border: 1px solid #00ffff;
+            padding: 12px;
             text-align: center;
         }
         th {
-            background: #00ffff;
-            color: #111;
-            font-weight: bold;
+            background: #4b0082;
+            color: #ccff00;
             text-transform: uppercase;
         }
-        tr:hover {
-            background: rgba(40, 40, 70, 0.9);
-        }
-        .available {
-            color: #33ff33;
-            font-weight: bold;
-        }
-        .low-stock {
-            color: #ffff33;
-            font-weight: bold;
-        }
-        .out-of-stock {
-            color: #ff3333;
-            font-weight: bold;
-        }
-        .status-info {
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.5);
-            margin-bottom: 20px;
-            border-radius: 5px;
-        }
+        .out-of-stock { color: #ff0000; font-weight: bold; }
+        .low-stock { color: #ffcc00; font-weight: bold; }
+        .available { color: #00ff00; }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -126,68 +98,52 @@ if ($totalStock > 20) {
 <h2><?= $tagline ?></h2>
 <h3>Owned by: <?= $owner ?> | Section: <?= $section ?></h3>
 
-<div class="status-info">
-    <p>
-        <?= "Total Product Types: $productCount" ?> <br>
-        <?= "Combined Total Stock: $totalStock units" ?> <br>
-        <?= "Total Catalog Value: $currency" . number_format($totalPrice, 2) ?>
-    </p>
-    <p>
-        *Store Message: **<?= $overallStatus ?>***
-    </p>
-</div>
-
+<p>
+    <?= "Total Product Types: " . count($items) ?> <br>
+    <?= "Combined Inventory: $totalStock items" ?> <br>
+    <?= "Total Catalog Value: $currency" . number_format($totalPrice, 2) ?> <br>
+    <?= "Relics Out of Stock: $outOfStock" ?> <br>
+</p>
+<h3>
+    <?= "Inventory Tier: $storeCategory" ?>
+</h3>
 
 <table>
     <tr>
-        <th>Product Name</th>
-        <th>Category</th>
+        <th>Product</th>
         <th>Price (<?= $currency ?>)</th>
+        <th>Type</th>
         <th>Stock</th>
-        <th>Availability Status</th>
+        <th>Status</th>
     </tr>
-
     <?php
-    foreach ($products as $item) {
-        $itemName = $item["name"];
-        $itemCategory = $item["category"];
-        $itemPrice = number_format($item["price"], 2);
-        $itemStock = $item["stock"];
+    foreach ($items as $product) {
+        $priceFormatted = number_format($product['price'], 2);
 
         $statusClass = "";
         $statusText = "";
-
-        if ($itemStock > 5) {
-            $statusClass = "available";
-            $statusText = "HIGH STOCK!";
-        } elseif ($itemStock > 0 && $itemStock <= 5) {
-            $statusClass = "low-stock";
-            $statusText = "Low Stock ($itemStock left)";
-        } else {
+        if ($product['stock'] == 0) {
             $statusClass = "out-of-stock";
-            $statusText = "OUT OF STOCK";
+            $statusText = "GAMEOVER";
+        } elseif ($product['stock'] <= 2) {
+            $statusClass = "low-stock";
+            $statusText = "LAST LIFE";
+        } else {
+            $statusClass = "available";
+            $statusText = "READY P1";
         }
-
-    ?>
-
-    <tr>
-        <td><?= $itemName ?></td>
-        <td><?= $itemCategory ?></td>
-        <td><?= $itemPrice ?></td>
-        <td><?= $itemStock ?></td>
-        <td>
-            <span class="<?= $statusClass ?>">
-                <?= $statusText ?>
-            </span>
-        </td>
-    </tr>
-
-    <?php
+        
+        echo "<tr>";
+        echo "<td>{$product['name']}</td>";
+        echo "<td>{$priceFormatted}</td>";
+        echo "<td>{$product['category']}</td>";
+        echo "<td>{$product['stock']}</td>";
+        
+        echo "<td><span class='{$statusClass}'>{$statusText}</span></td>"; 
+        echo "</tr>";
     }
     ?>
-
 </table>
-
 
 
 </body>
