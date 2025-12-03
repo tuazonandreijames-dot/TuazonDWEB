@@ -1,41 +1,41 @@
 <?php
+declare(strict_types=1); // I turned strict types on
+
 $storeName = "Cartridge Cove";
-$tagline = "Classic games para sa classic heartbreak";
-$owner = "Andrei James G. Tuazon";
-$section = "WD-201";
-$currency = "₱";
+$tagline   = "Classic games para sa classic heartbreak";
+$owner     = "Andrei James G. Tuazon";
+$section   = "WD-201";
+$currency  = "₱";
 
-require "items.php";
+// this where the global tax goes
+$tax_rate = 12; 
 
-$totalPrice = 0;
-$totalStock = 0;
-$outOfStock = 0;
+$cartridges = [
+    "NES Console"               => ["price" => 5500, "stock" => 3],
+    "Sega Genesis Model 2"      => ["price" => 3500, "stock" => 5],
+    "Super Mario World (SNES)"  => ["price" => 1500, "stock" => 0],
+    "Game Boy (Grey)"           => ["price" => 4000, "stock" => 1],
+    "PlayStation 1 (PSX)"       => ["price" => 4500, "stock" => 10],
 
-foreach ($items as $item) {
-    $totalPrice += $item["price"];
-    $totalStock += $item["stock"];
-    
-    if ($item["stock"] == 0) {
-        $outOfStock++;
-    }
+    // I added 3 to 5 more products here
+    "Donkey Kong Country"       => ["price" => 1100, "stock" => 12],
+    "Metal Gear Solid (PS1)"    => ["price" => 1800, "stock" => 4],
+    "Pac-Man Cartridge"         => ["price" => 700,  "stock" => 20],
+];
+
+function get_reorder_message(int $stock): string {
+    return ($stock < 10) ? "Yes" : "No";
 }
 
-switch (count($items)) {
-    case 1:
-        $storeCategory = "Single Cartridge Find";
-        break;
-    case 2:
-    case 3:
-        $storeCategory = "8-bit Starter Collection";
-        break;
-    case 4:
-    case 5:
-        $storeCategory = "16-bit Era Inventory";
-        break;
-    default:
-        $storeCategory = "Full Retro Workshop";
+
+function get_total_value(float $price, int $qty): float {
+    return $price * $qty;
 }
 
+
+function get_tax_due(float $price, int $qty, int $tax = 0): float {
+    return ($price * $qty) * ($tax / 100);
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -85,10 +85,8 @@ switch (count($items)) {
             color: #ccff00;
             text-transform: uppercase;
         }
-        .out-of-stock { color: #ff0000; font-weight: bold; }
-        .low-stock { color: #ffcc00; font-weight: bold; }
-        .available { color: #00ff00; }
     </style>
+
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 
@@ -98,53 +96,39 @@ switch (count($items)) {
 <h2><?= $tagline ?></h2>
 <h3>Owned by: <?= $owner ?> | Section: <?= $section ?></h3>
 
-<p>
-    <?= "Total Product Types: " . count($items) ?> <br>
-    <?= "Combined Inventory: $totalStock items" ?> <br>
-    <?= "Total Catalog Value: $currency" . number_format($totalPrice, 2) ?> <br>
-    <?= "Relics Out of Stock: $outOfStock" ?> <br>
-</p>
-<h3>
-    <?= "Inventory Tier: $storeCategory" ?>
-</h3>
-
 <table>
     <tr>
         <th>Product</th>
-        <th>Price (<?= $currency ?>)</th>
-        <th>Type</th>
+        <th>Price (₱)</th>
         <th>Stock</th>
-        <th>Status</th>
+        <th>Reorder?</th>
+        <th>Total Value</th>
+        <th>Tax (<?= $tax_rate ?>%)</th>
     </tr>
-    <?php
-    foreach ($items as $product) {
-        $priceFormatted = number_format($product['price'], 2);
 
-        $statusClass = "";
-        $statusText = "";
-        if ($product['stock'] == 0) {
-            $statusClass = "out-of-stock";
-            $statusText = "GAMEOVER";
-        } elseif ($product['stock'] <= 2) {
-            $statusClass = "low-stock";
-            $statusText = "LAST LIFE";
-        } else {
-            $statusClass = "available";
-            $statusText = "READY P1";
-        }
-        
+    <?php
+    foreach ($cartridges as $product_name => $data) {
+
+        $price = $data["price"];
+        $stock = $data["stock"];
+
         echo "<tr>";
-        echo "<td>{$product['name']}</td>";
-        echo "<td>{$priceFormatted}</td>";
-        echo "<td>{$product['category']}</td>";
-        echo "<td>{$product['stock']}</td>";
-        
-        echo "<td><span class='{$statusClass}'>{$statusText}</span></td>"; 
+
+        echo "<td>$product_name</td>";
+
+        echo "<td>" . number_format($price, 2) . "</td>";
+        echo "<td>$stock</td>";
+
+        echo "<td>" . get_reorder_message($stock) . "</td>";
+
+        echo "<td>" . number_format(get_total_value($price, $stock), 2) . "</td>";
+
+        echo "<td>" . number_format(get_tax_due($price, $stock, $tax_rate), 2) . "</td>";
+
         echo "</tr>";
     }
     ?>
 </table>
-
 
 </body>
 </html>
